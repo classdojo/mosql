@@ -68,7 +68,15 @@ module MoSQL
       obj = obj.dup
       row = []
       schema[:columns].each do |name, type|
-        v = obj.delete(name)
+
+        if name.include? "."
+          v = resolve_dot_syntax(obj, name)
+        else
+          v = obj.delete(name)
+        end
+
+        # log.info("column #{name}=#{v}")
+
         case v
         when BSON::Binary, BSON::ObjectId
           v = v.to_s
@@ -88,6 +96,22 @@ module MoSQL
       log.debug { "Transformed: #{row.inspect}" }
 
       row
+    end
+
+    def resolve_dot_syntax(obj, selector)
+      parts = selector.is_a?(Array) ? selector : selector.split(".")
+
+      if !obj.is_a?(BSON::OrderedHash)
+        return nil
+      end
+
+      child_obj = obj[parts.shift]
+
+      if parts.length == 0
+        return child_obj
+      end
+
+        resolve_dot_syntax(child_obj, parts)
     end
 
     def all_columns(schema)
