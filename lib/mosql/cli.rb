@@ -195,7 +195,7 @@ module MoSQL
       @schemamap.create_schema(@sql.db, !options[:no_drop_tables])
 
       unless options[:skip_tail]
-        start_ts = @mongo['local']['oplog.rs'].find_one({}, {:sort => [['$natural', -1]]})['ts']
+        start_ts = @mongo['admin']['oplog.rs'].find_one({}, {:sort => [['$natural', -1]]})['ts']
       end
 
       want_dbs = @schemamap.all_mongo_dbs & @mongo.database_names
