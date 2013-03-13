@@ -150,6 +150,9 @@ module MoSQL
       when false
         'f'
       else
+        v = val.to_s
+        v.force_encoding("binary")
+        v = v.encode("utf-8", :invalid => :replace, :undef => :replace)
         val.to_s.gsub(/([\\\t\n\r])/, '\\\\\\1')
       end
     end
