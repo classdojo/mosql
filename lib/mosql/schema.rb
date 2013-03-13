@@ -101,11 +101,14 @@ module MoSQL
     def resolve_dot_syntax(obj, selector)
       parts = selector.is_a?(Array) ? selector : selector.split(".")
 
-      if !obj.is_a?(BSON::OrderedHash)
+      if obj.kind_of?(Array)
+        child_obj = obj[Integer(parts.shift)]
+      elsif obj.is_a?(BSON::OrderedHash)
+        child_obj = obj[parts.shift]
+      else
         return nil
       end
 
-      child_obj = obj[parts.shift]
 
       if parts.length == 0
         return child_obj
